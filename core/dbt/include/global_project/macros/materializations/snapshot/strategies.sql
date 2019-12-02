@@ -88,7 +88,15 @@
     {% set updated_at = snapshot_get_time() %}
 
     {% if check_cols_config == 'all' %}
-        {% set check_cols = get_columns_in_query(node['injected_sql']) %}
+        {% set all_cols = get_columns_in_query(node['injected_sql']) %}
+        {% set include_cols = [] %}
+        {% set except = config['except'] %}
+        {% for col in all_cols %}
+            {% if col not in except %}
+                {% set _ = include_cols.append(col) %}
+            {% endif %}
+        {% endfor %}
+        {% set check_cols = include_cols %}
     {% elif check_cols_config is iterable and (check_cols_config | length) > 0 %}
         {% set check_cols = check_cols_config %}
     {% else %}
